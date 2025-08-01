@@ -8,17 +8,42 @@ A powerful Python script to download YouTube videos and convert them to high-qua
 
 ## ✨ Features
 
-- 🎵 Download single YouTube videos as MP3
-- 📋 Download entire playlists as MP3
-- 🎧 Customizable audio quality (64, 128, 192, 256, 320 kbps)
-- 📊 Get video information without downloading
-- 📁 Automatic file organization
-- 🔄 Batch download from URL lists
-- ⚡ Fast and reliable downloads
-- 🛡️ Error handling and retry mechanisms
-- 🌐 Cross-platform compatibility
+### 🎵 Basic Features (All Versions)
+- Download single YouTube videos as MP3
+- Download entire playlists as MP3
+- Customizable audio quality (64, 128, 192, 256, 320 kbps)
+- Get video information without downloading
+- Automatic file organization
+- Cross-platform compatibility
+
+### ⚡ Advanced Features (`youtube_to_mp3_advanced.py`)
+- 📥 Resume interrupted downloads automatically
+- 🖼️ Download and embed thumbnails as album art
+- 🏷️ Extract and apply metadata (title, artist, duration, etc.)
+- 📋 Automatic playlist detection from video URLs
+- ⚡ Parallel downloads for faster processing
+- � Rate limiting to be respectful to servers
+- 📊 Download history tracking
+
+### 🧠 Smart Features (`youtube_to_mp3_smart.py`)
+- 🔍 Intelligent duplicate detection and skipping
+- 🏷️ Enhanced automatic metadata tagging
+- 📁 Smart playlist organization into folders
+- ⭐ Download history and favorites system
+- 🔄 Auto-retry with exponential backoff
+- 📊 Comprehensive statistics and reporting
+- 🛡️ Thread-safe operations with file locking
+- 🎯 Content-based similarity detection
 
 ## 🚀 Quick Start
+
+### Three Versions Available
+
+1. **`youtube_to_mp3.py`** - Basic version with core functionality
+2. **`youtube_to_mp3_advanced.py`** - Advanced version with parallel downloads, resume, thumbnails
+3. **`youtube_to_mp3_smart.py`** - Smart version with AI-like features, duplicate detection, auto-retry
+
+Choose the version that best fits your needs!
 
 ### Prerequisites
 
@@ -59,39 +84,58 @@ A powerful Python script to download YouTube videos and convert them to high-qua
 
 ## 📖 Usage
 
-### Basic Examples
+### Basic Version (`youtube_to_mp3.py`)
 
 **Download a single video:**
 ```bash
 python youtube_to_mp3.py "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 ```
 
-**High quality download:**
+**Batch download:**
 ```bash
-python youtube_to_mp3.py -q 320 "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+python youtube_to_mp3.py -f urls_to_download.txt
 ```
 
-**Download to specific folder:**
+### Advanced Version (`youtube_to_mp3_advanced.py`)
+
+**Parallel downloads with thumbnails:**
 ```bash
-python youtube_to_mp3.py -o "my_music" "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+python youtube_to_mp3_advanced.py -f urls.txt -w 5 -q 320
 ```
 
-### Advanced Features
-
-**Download entire playlist:**
+**Resume interrupted downloads:**
 ```bash
-python youtube_to_mp3.py -p "https://www.youtube.com/playlist?list=PLexampleplaylist"
+python youtube_to_mp3_advanced.py --resume
 ```
 
-**Batch download from file:**
+**Auto-detect playlist:**
 ```bash
-python youtube_to_mp3.py -f urls_to_download.txt -o "Downloaded_Songs" -q 192
+python youtube_to_mp3_advanced.py --auto-playlist "VIDEO_URL"
 ```
 
-**Get video information:**
+### Smart Version (`youtube_to_mp3_smart.py`)
+
+**Smart batch download with duplicate detection:**
 ```bash
-python youtube_to_mp3.py -i "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+python youtube_to_mp3_smart.py -f urls.txt --skip-duplicates -w 3
 ```
+
+**View statistics:**
+```bash
+python youtube_to_mp3_smart.py --stats
+```
+
+**Add to favorites:**
+```bash
+python youtube_to_mp3_smart.py --add-favorite VIDEO_ID
+```
+
+### Batch Scripts
+
+**Windows users can use the convenient batch files:**
+- `download.bat` - Basic downloader
+- `download_advanced.bat` - Advanced features
+- `download_smart.bat` - Smart features
 
 ### Command Line Options
 
@@ -108,15 +152,31 @@ python youtube_to_mp3.py -i "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 
 ```
 youtube-to-mp3-downloader/
-├── youtube_to_mp3.py          # Main script
-├── convert_webm_to_mp3.py     # WebM to MP3 converter
-├── requirements.txt           # Python dependencies
-├── urls_to_download.txt       # Sample URL list
-├── download.bat               # Windows batch script
-├── download_all.bat           # Batch download script
-├── install_ffmpeg.bat         # FFmpeg installer (Windows)
-├── README.md                  # Documentation
-└── .gitignore                 # Git ignore rules
+├── 🎵 Core Scripts
+│   ├── youtube_to_mp3.py              # Basic downloader
+│   ├── youtube_to_mp3_advanced.py     # Advanced features
+│   └── youtube_to_mp3_smart.py        # Smart features with AI-like capabilities
+├── 🔧 Utilities
+│   ├── convert_webm_to_mp3.py         # WebM to MP3 converter
+│   └── install_ffmpeg.bat             # FFmpeg installer (Windows)
+├── 📋 Configuration
+│   ├── config.ini                     # Basic configuration
+│   ├── smart_config.ini               # Smart features configuration
+│   └── requirements.txt               # Python dependencies
+├── 🚀 Batch Scripts
+│   ├── download.bat                   # Basic batch downloader
+│   ├── download_advanced.bat          # Advanced batch downloader
+│   ├── download_smart.bat             # Smart batch downloader
+│   └── download_all.bat               # Batch download all URLs
+├── 📄 Documentation
+│   ├── README.md                      # Comprehensive documentation
+│   └── LICENSE                        # MIT License
+└── 📂 Runtime Directories (created automatically)
+    ├── downloads/                     # Downloaded MP3 files
+    ├── playlists/                     # Organized playlist folders
+    ├── thumbnails/                    # Downloaded thumbnails/album art
+    ├── metadata/                      # Video metadata JSON files
+    └── .history/                      # Download history and statistics
 ```
 
 ## 🎵 Audio Quality Settings
