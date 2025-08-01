@@ -1,0 +1,42 @@
+[
+  {
+    "test": "Health Check",
+    "success": true,
+    "details": "Server is healthy. Active downloads: 0",
+    "timestamp": "2025-08-01 19:08:10",
+    "status_code": 200,
+    "response_time": 2.05249
+  },
+  {
+    "test": "Root Endpoint",
+    "success": true,
+    "details": "API version: 2.0.0",
+    "timestamp": "2025-08-01 19:08:10",
+    "status_code": 200,
+    "response_time": 0.001452
+  },
+  {
+    "test": "Video Info",
+    "success": true,
+    "details": "Title: Rick Astley - Never Gonna Give You Up (Official Vi... | Uploader: Rick Astley",
+    "timestamp": "2025-08-01 19:08:22",
+    "status_code": 200,
+    "response_time": 11.421609
+  },
+  {
+    "test": "List Files",
+    "success": true,
+    "details": "Found 0 MP3 files",
+    "timestamp": "2025-08-01 19:08:22",
+    "status_code": 200,
+    "response_time": 0.001708
+  },
+  {
+    "test": "Upload URLs",
+    "success": true,
+    "details": "Uploaded file with 2 URLs",
+    "timestamp": "2025-08-01 19:08:22",
+    "status_code": 200,
+    "response_time": 0.001985
+  }
+]

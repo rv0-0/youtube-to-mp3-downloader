@@ -86,7 +86,7 @@ class TestDownloaderFunctions(unittest.TestCase):
             self.skipTest("AdvancedYouTubeDownloader not available")
         
         try:
-            downloader = AdvancedYouTubeDownloader(self.temp_dir, "192", max_workers=2)
+            downloader = AdvancedYouTubeDownloader(output_path=self.temp_dir, quality="192", max_workers=2)
             self.assertEqual(str(downloader.output_path), self.temp_dir)
             self.assertEqual(downloader.quality, "192")
             self.assertEqual(downloader.max_workers, 2)
@@ -99,7 +99,7 @@ class TestDownloaderFunctions(unittest.TestCase):
             self.skipTest("SmartYouTubeDownloader not available")
         
         try:
-            downloader = SmartYouTubeDownloader(self.temp_dir, "192", max_workers=2)
+            downloader = SmartYouTubeDownloader(output_path=self.temp_dir, quality="192", max_workers=2)
             self.assertEqual(str(downloader.output_path), self.temp_dir)
             self.assertEqual(downloader.quality, "192")
             self.assertEqual(downloader.max_workers, 2)

@@ -358,6 +358,7 @@ class YouTubeAPI_Tester:
         
         start_time = time.time()
         completed_tasks = set()
+        all_done = False  # Initialize all_done before the loop
         
         while time.time() - start_time < max_wait_time:
             all_done = True

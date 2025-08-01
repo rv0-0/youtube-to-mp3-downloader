@@ -19,7 +19,8 @@ import threading
 from typing import List, Dict, Optional, Tuple
 import yt_dlp
 from mutagen.mp3 import MP3
-from mutagen.id3 import ID3, APIC, TIT2, TPE1, TALB, TDRC, TRCK
+from mutagen.id3 import ID3
+from mutagen.id3._frames import APIC, TIT2, TPE1, TALB, TDRC, TRCK
 from PIL import Image
 import requests
 
@@ -113,6 +114,9 @@ class AdvancedYouTubeDownloader:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info = ydl.extract_info(url, download=False)
                 
+                if info is None:
+                    return {}
+                
                 metadata = {
                     'id': info.get('id', ''),
                     'title': info.get('title', 'Unknown'),
@@ -190,43 +194,45 @@ class AdvancedYouTubeDownloader:
             if audio_file.tags is None:
                 audio_file.add_tags()
             
-            # Clear existing tags
-            audio_file.tags.clear()
-            
-            # Add metadata
-            if metadata.get('title'):
-                audio_file.tags.add(TIT2(encoding=3, text=metadata['title']))
-            
-            if metadata.get('uploader'):
-                audio_file.tags.add(TPE1(encoding=3, text=metadata['uploader']))
-            
-            if metadata.get('playlist_title'):
-                audio_file.tags.add(TALB(encoding=3, text=metadata['playlist_title']))
-            
-            if metadata.get('upload_date'):
-                try:
-                    year = metadata['upload_date'][:4]
-                    audio_file.tags.add(TDRC(encoding=3, text=year))
-                except:
-                    pass
-            
-            if metadata.get('playlist_index'):
-                audio_file.tags.add(TRCK(encoding=3, text=str(metadata['playlist_index'])))
-            
-            # Add album art
-            if thumbnail_path and thumbnail_path.exists():
-                with open(thumbnail_path, 'rb') as f:
-                    album_art = f.read()
+            # Ensure tags exist before proceeding
+            if audio_file.tags is not None:
+                # Clear existing tags
+                audio_file.tags.clear()
                 
-                audio_file.tags.add(
-                    APIC(
-                        encoding=3,
-                        mime='image/jpeg',
-                        type=3,  # Cover (front)
-                        desc='Cover',
-                        data=album_art
+                # Add metadata
+                if metadata.get('title'):
+                    audio_file.tags.add(TIT2(encoding=3, text=metadata['title']))
+                
+                if metadata.get('uploader'):
+                    audio_file.tags.add(TPE1(encoding=3, text=metadata['uploader']))
+                
+                if metadata.get('playlist_title'):
+                    audio_file.tags.add(TALB(encoding=3, text=metadata['playlist_title']))
+                
+                if metadata.get('upload_date'):
+                    try:
+                        year = metadata['upload_date'][:4]
+                        audio_file.tags.add(TDRC(encoding=3, text=year))
+                    except:
+                        pass
+                
+                if metadata.get('playlist_index'):
+                    audio_file.tags.add(TRCK(encoding=3, text=str(metadata['playlist_index'])))
+                
+                # Add album art
+                if thumbnail_path and thumbnail_path.exists():
+                    with open(thumbnail_path, 'rb') as f:
+                        album_art = f.read()
+                    
+                    audio_file.tags.add(
+                        APIC(
+                            encoding=3,
+                            mime='image/jpeg',
+                            type=3,  # Cover (front)
+                            desc='Cover',
+                            data=album_art
+                        )
                     )
-                )
             
             # Save changes
             audio_file.save()
@@ -245,7 +251,7 @@ class AdvancedYouTubeDownloader:
         except Exception as e:
             print(f"⚠️ Could not save metadata file: {e}")
     
-    def check_resume(self, video_id: str, expected_title: str = None) -> Optional[Path]:
+    def check_resume(self, video_id: str, expected_title: Optional[str] = None) -> Optional[Path]:
         """Check if download can be resumed or if file already exists."""
         # Check if already downloaded successfully
         if video_id in self.download_history:
@@ -463,7 +469,11 @@ class AdvancedYouTubeDownloader:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 playlist_info = ydl.extract_info(playlist_url, download=False)
                 
-                if 'entries' in playlist_info:
+                if playlist_info is None:
+                    print("❌ Could not extract playlist information")
+                    return []
+                
+                if 'entries' in playlist_info and playlist_info['entries']:
                     urls = []
                     for entry in playlist_info['entries']:
                         if entry and entry.get('url'):
@@ -471,7 +481,8 @@ class AdvancedYouTubeDownloader:
                         elif entry and entry.get('id'):
                             urls.append(f"https://www.youtube.com/watch?v={entry['id']}")
                     
-                    print(f"📋 Found {len(urls)} videos in playlist: {playlist_info.get('title', 'Unknown')}")
+                    title = playlist_info.get('title', 'Unknown') if playlist_info else 'Unknown'
+                    print(f"📋 Found {len(urls)} videos in playlist: {title}")
                     return urls
                 else:
                     print("❌ No videos found in playlist")

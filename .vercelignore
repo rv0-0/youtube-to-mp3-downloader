@@ -1,0 +1,34 @@
+# Development files
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.log
+
+# Frontend development
+frontend/node_modules/
+frontend/src/
+frontend/public/
+
+# Downloads and media
+downloads/
+*.mp3
+*.mp4
+*.webm
+
+# IDE files
+.vscode/
+.idea/
+
+# Scripts and tests
+scripts/
+tests/
+docs/
+
+# Config files
+config/
+web/
+
+# OS files
+.DS_Store
+Thumbs.db

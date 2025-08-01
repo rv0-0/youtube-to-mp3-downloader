@@ -93,11 +93,11 @@ def get_basic_downloader(output_dir: str, quality: int):
 
 def get_advanced_downloader(output_dir: str, quality: int):
     """Advanced downloader using AdvancedYouTubeDownloader class"""
-    return AdvancedYouTubeDownloader(output_dir, str(quality))
+    return AdvancedYouTubeDownloader(output_path=output_dir, quality=str(quality))
 
 def get_smart_downloader(output_dir: str, quality: int):
     """Smart downloader using SmartYouTubeDownloader class"""
-    return SmartYouTubeDownloader(output_dir, str(quality))
+    return SmartYouTubeDownloader(output_path=output_dir, quality=str(quality))
 
 # Pydantic models for request/response
 class DownloadRequest(BaseModel):

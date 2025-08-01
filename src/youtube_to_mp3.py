@@ -130,6 +130,8 @@ def get_video_info(url):
         
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
+            if info is None:
+                return None
             return {
                 'title': info.get('title', 'Unknown'),
                 'duration': info.get('duration', 0),

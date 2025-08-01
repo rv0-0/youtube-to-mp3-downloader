@@ -244,7 +244,27 @@ npm run build
 ✅ **Developer-Friendly** with hot reload and modern tools  
 ✅ **Comprehensive Documentation** and examples  
 
-## 📄 **License**
+## � **Deploy to Vercel**
+
+This project is optimized for **Vercel deployment** with serverless functions!
+
+### 🌐 **One-Click Deployment**
+```bash
+# Deploy to Vercel
+scripts\deploy_vercel.bat
+```
+
+### ⚙️ **Vercel Features**
+- ✅ **Serverless API** with Python functions
+- ✅ **Automatic HTTPS** and custom domains
+- ✅ **Global CDN** for fast frontend delivery
+- ✅ **Zero Configuration** deployment
+- ✅ **GitHub Integration** for automatic deployments
+
+### 📚 **Deployment Guide**
+See [docs/VERCEL_DEPLOYMENT.md](docs/VERCEL_DEPLOYMENT.md) for detailed instructions.
+
+## �📄 **License**
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
