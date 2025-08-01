@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube to MP3 Downloader - Web Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1em;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-downloading { background: #d1ecf1; color: #0c5460; }
+        .status-completed { background: #d4edda; color: #155724; }
+        .status-failed { background: #f8d7da; color: #721c24; }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        .file-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .file-meta {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.9em;
+            background: #6c757d;
+        }
+
+        .btn-download {
+            background: #28a745;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .api-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .api-status.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .api-status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎵 YouTube to MP3 Downloader</h1>
+            <p>Download YouTube videos as high-quality MP3 files with our smart API</p>
+        </div>
+
+        <div class="api-status" id="apiStatus">
+            <div class="loading"></div>
+            Checking API connection...
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('single')">Single Download</button>
+            <button class="tab" onclick="showTab('batch')">Batch Download</button>
+            <button class="tab" onclick="showTab('tasks')">Download Tasks</button>
+            <button class="tab" onclick="showTab('files')">My Files</button>
+        </div>
+
+        <!-- Single Download Tab -->
+        <div class="tab-content active" id="single">
+            <form id="singleDownloadForm">
+                <div class="form-group">
+                    <label for="singleUrl">YouTube URL</label>
+                    <input type="url" id="singleUrl" name="url" placeholder="https://www.youtube.com/watch?v=..." required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="singleMode">Download Mode</label>
+                        <select id="singleMode" name="mode">
+                            <option value="smart">Smart (Recommended)</option>
+                            <option value="advanced">Advanced</option>
+                            <option value="basic">Basic</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="singleQuality">Audio Quality</label>
+                        <select id="singleQuality" name="quality">
+                            <option value="320">320 kbps (Best)</option>
+                            <option value="256">256 kbps</option>
+                            <option value="192" selected>192 kbps</option>
+                            <option value="128">128 kbps</option>
+                            <option value="64">64 kbps</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="singleOutput">Output Folder</label>
+                        <input type="text" id="singleOutput" name="output_dir" value="downloads" placeholder="downloads">
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn">
+                    <span id="singleDownloadText">Start Download</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Batch Download Tab -->
+        <div class="tab-content" id="batch">
+            <form id="batchDownloadForm">
+                <div class="form-group">
+                    <label for="batchUrls">YouTube URLs (one per line)</label>
+                    <textarea id="batchUrls" name="urls" rows="6" placeholder="https://www.youtube.com/watch?v=...
+https://www.youtube.com/watch?v=...
+https://www.youtube.com/watch?v=..."></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="batchMode">Download Mode</label>
+                        <select id="batchMode" name="mode">
+                            <option value="smart">Smart (Recommended)</option>
+                            <option value="advanced">Advanced</option>
+                            <option value="basic">Basic</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="batchQuality">Audio Quality</label>
+                        <select id="batchQuality" name="quality">
+                            <option value="320">320 kbps (Best)</option>
+                            <option value="256">256 kbps</option>
+                            <option value="192" selected>192 kbps</option>
+                            <option value="128">128 kbps</option>
+                            <option value="64">64 kbps</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="batchWorkers">Parallel Downloads</label>
+                        <select id="batchWorkers" name="max_workers">
+                            <option value="1">1 (Slower)</option>
+                            <option value="2">2</option>
+                            <option value="3" selected>3 (Recommended)</option>
+                            <option value="4">4</option>
+                            <option value="5">5 (Faster)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn">
+                    <span id="batchDownloadText">Start Batch Download</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Tasks Tab -->
+        <div class="tab-content" id="tasks">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                <h3>Download Tasks</h3>
+                <button class="btn" onclick="refreshTasks()" style="width: auto; padding: 10px 20px;">
+                    🔄 Refresh
+                </button>
+            </div>
+            <div id="tasksList">
+                <!-- Tasks will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Files Tab -->
+        <div class="tab-content" id="files">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                <h3>Downloaded Files</h3>
+                <button class="btn" onclick="refreshFiles()" style="width: auto; padding: 10px 20px;">
+                    🔄 Refresh
+                </button>
+            </div>
+            <div id="filesList" class="file-list">
+                <!-- Files will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        let currentTasks = {};
+
+        // Check API connection
+        async function checkApiConnection() {
+            const statusEl = document.getElementById('apiStatus');
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                if (response.ok) {
+                    statusEl.className = 'api-status connected';
+                    statusEl.innerHTML = '✅ API Connected';
+                } else {
+                    throw new Error('API not responding');
+                }
+            } catch (error) {
+                statusEl.className = 'api-status disconnected';
+                statusEl.innerHTML = '❌ API Disconnected - Make sure the server is running';
+            }
+        }
+
+        // Tab switching
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            // Load data for specific tabs
+            if (tabName === 'tasks') {
+                refreshTasks();
+            } else if (tabName === 'files') {
+                refreshFiles();
+            }
+        }
+
+        // Single download form
+        document.getElementById('singleDownloadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = {
+                url: formData.get('url'),
+                quality: parseInt(formData.get('quality')),
+                output_dir: formData.get('output_dir'),
+                mode: formData.get('mode')
+            };
+
+            const btn = document.getElementById('singleDownloadText');
+            btn.innerHTML = '<div class="loading"></div>Starting download...';
+            document.querySelector('#singleDownloadForm button').disabled = true;
+
+            try {
+                const response = await fetch(`${API_BASE}/download`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showAlert('success', `Download started! Task ID: ${result.task_id}`);
+                    currentTasks[result.task_id] = result;
+                    
+                    // Switch to tasks tab to monitor progress
+                    showTab('tasks');
+                    refreshTasks();
+                } else {
+                    showAlert('error', `Error: ${result.detail}`);
+                }
+            } catch (error) {
+                showAlert('error', `Network error: ${error.message}`);
+            } finally {
+                btn.innerHTML = 'Start Download';
+                document.querySelector('#singleDownloadForm button').disabled = false;
+            }
+        });
+
+        // Batch download form
+        document.getElementById('batchDownloadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const urlsText = formData.get('urls');
+            const urls = urlsText.split('\n').filter(url => url.trim()).map(url => url.trim());
+
+            if (urls.length === 0) {
+                showAlert('error', 'Please enter at least one URL');
+                return;
+            }
+
+            const data = {
+                urls: urls,
+                quality: parseInt(formData.get('quality')),
+                output_dir: 'downloads',
+                mode: formData.get('mode'),
+                max_workers: parseInt(formData.get('max_workers'))
+            };
+
+            const btn = document.getElementById('batchDownloadText');
+            btn.innerHTML = '<div class="loading"></div>Starting batch download...';
+            document.querySelector('#batchDownloadForm button').disabled = true;
+
+            try {
+                const response = await fetch(`${API_BASE}/batch-download`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showAlert('success', `Batch download started! Task ID: ${result.task_id}`);
+                    currentTasks[result.task_id] = result;
+                    
+                    // Switch to tasks tab to monitor progress
+                    showTab('tasks');
+                    refreshTasks();
+                } else {
+                    showAlert('error', `Error: ${result.detail}`);
+                }
+            } catch (error) {
+                showAlert('error', `Network error: ${error.message}`);
+            } finally {
+                btn.innerHTML = 'Start Batch Download';
+                document.querySelector('#batchDownloadForm button').disabled = false;
+            }
+        });
+
+        // Refresh tasks
+        async function refreshTasks() {
+            try {
+                const response = await fetch(`${API_BASE}/tasks`);
+                const data = await response.json();
+
+                const tasksHtml = data.tasks.map(task => `
+                    <div class="status-card">
+                        <div class="status-header">
+                            <strong>Task: ${task.task_id.substring(0, 8)}...</strong>
+                            <span class="status-badge status-${task.status}">${task.status.toUpperCase()}</span>
+                        </div>
+                        <div>
+                            <strong>URL:</strong> ${task.url || `${task.urls?.length || 0} URLs`}<br>
+                            <strong>Mode:</strong> ${task.mode} | <strong>Quality:</strong> ${task.quality} kbps<br>
+                            <strong>Created:</strong> ${new Date(task.created_at).toLocaleString()}
+                        </div>
+                        ${task.progress !== undefined ? `
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${task.progress}%"></div>
+                            </div>
+                            <div style="font-size: 0.9em; color: #666;">
+                                Progress: ${task.progress.toFixed(1)}%
+                                ${task.current_file ? `<br>Current: ${task.current_file}` : ''}
+                            </div>
+                        ` : ''}
+                        ${task.downloaded_files?.length > 0 ? `
+                            <div style="margin-top: 10px;">
+                                <strong>Downloaded:</strong> ${task.downloaded_files.length} files
+                            </div>
+                        ` : ''}
+                        ${task.error_message ? `
+                            <div style="color: #dc3545; margin-top: 10px;">
+                                <strong>Error:</strong> ${task.error_message}
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+
+                document.getElementById('tasksList').innerHTML = tasksHtml || '<p>No download tasks yet.</p>';
+            } catch (error) {
+                console.error('Error refreshing tasks:', error);
+            }
+        }
+
+        // Refresh files
+        async function refreshFiles() {
+            try {
+                const response = await fetch(`${API_BASE}/files`);
+                const data = await response.json();
+
+                const filesHtml = data.files.map(file => `
+                    <div class="file-item">
+                        <div class="file-info">
+                            <div class="file-name">🎵 ${file.filename}</div>
+                            <div class="file-meta">
+                                Size: ${(file.size / (1024 * 1024)).toFixed(2)} MB | 
+                                Created: ${new Date(file.created).toLocaleString()}
+                            </div>
+                        </div>
+                        <div class="file-actions">
+                            <button class="btn btn-small btn-download" onclick="downloadFile('${file.filename}')">
+                                📥 Download
+                            </button>
+                            <button class="btn btn-small btn-delete" onclick="deleteFile('${file.filename}')">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+                document.getElementById('filesList').innerHTML = filesHtml || '<p>No files downloaded yet.</p>';
+            } catch (error) {
+                console.error('Error refreshing files:', error);
+            }
+        }
+
+        // Download file
+        function downloadFile(filename) {
+            window.open(`${API_BASE}/download-file/${encodeURIComponent(filename)}`, '_blank');
+        }
+
+        // Delete file
+        async function deleteFile(filename) {
+            if (!confirm(`Are you sure you want to delete "${filename}"?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/files/${encodeURIComponent(filename)}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showAlert('success', `File "${filename}" deleted successfully`);
+                    refreshFiles();
+                } else {
+                    const error = await response.json();
+                    showAlert('error', `Error deleting file: ${error.detail}`);
+                }
+            } catch (error) {
+                showAlert('error', `Network error: ${error.message}`);
+            }
+        }
+
+        // Show alert
+        function showAlert(type, message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            document.querySelector('.container').insertBefore(alertDiv, document.querySelector('.tabs'));
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        // Auto-refresh tasks every 2 seconds when on tasks tab
+        setInterval(() => {
+            const activeTab = document.querySelector('.tab-content.active');
+            if (activeTab && activeTab.id === 'tasks') {
+                refreshTasks();
+            }
+        }, 2000);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            checkApiConnection();
+            setInterval(checkApiConnection, 30000); // Check every 30 seconds
+        });
+    </script>
+</body>
+</html>

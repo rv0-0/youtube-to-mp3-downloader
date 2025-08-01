@@ -148,6 +148,98 @@ python youtube_to_mp3_smart.py --add-favorite VIDEO_ID
 | `-f, --file` | Download URLs from text file | `None` |
 | `-h, --help` | Show help message | - |
 
+## 🌐 **FastAPI Web Server & API**
+
+We now provide a **REST API** and **Web Interface** for easy integration and browser-based usage!
+
+### 🚀 **Quick Start - API Server**
+
+1. **Start the API server:**
+   ```cmd
+   start_api_server.bat
+   ```
+   - Server runs on: `http://localhost:8000`
+   - API Documentation: `http://localhost:8000/docs`
+   - Alternative docs: `http://localhost:8000/redoc`
+
+2. **Open Web Interface:**
+   - Open `web_interface.html` in your browser
+   - Beautiful, responsive UI for all features
+   - Real-time download progress tracking
+
+### 📡 **API Endpoints**
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/` | API information and available endpoints |
+| `GET` | `/health` | Health check and server status |
+| `POST` | `/download` | Download single YouTube video |
+| `POST` | `/batch-download` | Download multiple videos |
+| `GET` | `/status/{task_id}` | Get download task status |
+| `GET` | `/tasks` | List all download tasks |
+| `GET` | `/info?url=VIDEO_URL` | Get video information |
+| `GET` | `/files` | List downloaded MP3 files |
+| `GET` | `/download-file/{filename}` | Download specific MP3 file |
+| `DELETE` | `/files/{filename}` | Delete specific MP3 file |
+| `POST` | `/upload-urls` | Upload text file with URLs |
+
+### 💡 **API Usage Examples**
+
+**Single Download:**
+```bash
+curl -X POST "http://localhost:8000/download" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "quality": 320,
+    "mode": "smart"
+  }'
+```
+
+**Batch Download:**
+```bash
+curl -X POST "http://localhost:8000/batch-download" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "urls": [
+      "https://www.youtube.com/watch?v=VIDEO1",
+      "https://www.youtube.com/watch?v=VIDEO2"
+    ],
+    "quality": 192,
+    "mode": "smart",
+    "max_workers": 3
+  }'
+```
+
+**Check Task Status:**
+```bash
+curl "http://localhost:8000/status/TASK_ID"
+```
+
+**Get Video Info:**
+```bash
+curl "http://localhost:8000/info?url=https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+```
+
+### 🎨 **Web Interface Features**
+
+- **Single Download**: Paste URL and download instantly
+- **Batch Download**: Multiple URLs with parallel processing
+- **Real-time Progress**: Live status updates and progress bars
+- **File Management**: Browse, download, and delete MP3 files
+- **Task Monitoring**: Track all downloads with detailed status
+- **Responsive Design**: Works on desktop, tablet, and mobile
+- **Auto-refresh**: Automatic status updates every 2 seconds
+
+### 🔧 **Integration Ready**
+
+The FastAPI server is perfect for:
+- **Frontend Frameworks**: React, Vue, Angular, etc.
+- **Mobile Apps**: Flutter, React Native, native iOS/Android
+- **Desktop Apps**: Electron, Tauri, PyQt, etc.
+- **Automation**: CI/CD pipelines, scripts, webhooks
+- **Third-party Integration**: Discord bots, Telegram bots, etc.
+
 ## 📁 Project Structure
 
 ```
@@ -156,6 +248,10 @@ youtube-to-mp3-downloader/
 │   ├── youtube_to_mp3.py              # Basic downloader
 │   ├── youtube_to_mp3_advanced.py     # Advanced features
 │   └── youtube_to_mp3_smart.py        # Smart features with AI-like capabilities
+├── 🌐 Web API & Interface
+│   ├── api_server.py                  # FastAPI REST server
+│   ├── web_interface.html             # Beautiful web UI
+│   └── start_api_server.bat           # API server launcher
 ├── 🔧 Utilities
 │   ├── convert_webm_to_mp3.py         # WebM to MP3 converter
 │   └── install_ffmpeg.bat             # FFmpeg installer (Windows)
