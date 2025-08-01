@@ -132,10 +132,10 @@ python youtube_to_mp3_smart.py --add-favorite VIDEO_ID
 
 ### Batch Scripts
 
-**Windows users can use the convenient batch files:**
-- `download.bat` - Basic downloader
-- `download_advanced.bat` - Advanced features
-- `download_smart.bat` - Smart features
+**Windows users can use the simplified batch files:**
+- `youtube_downloader.bat` - Universal launcher with interactive menu
+- `quick_download.bat` - One-click download (smart mode, 320kbps)
+- `install_ffmpeg.bat` - Install FFmpeg automatically
 
 ### Command Line Options
 
@@ -164,10 +164,9 @@ youtube-to-mp3-downloader/
 │   ├── smart_config.ini               # Smart features configuration
 │   └── requirements.txt               # Python dependencies
 ├── 🚀 Batch Scripts
-│   ├── download.bat                   # Basic batch downloader
-│   ├── download_advanced.bat          # Advanced batch downloader
-│   ├── download_smart.bat             # Smart batch downloader
-│   └── download_all.bat               # Batch download all URLs
+│   ├── youtube_downloader.bat         # Universal launcher with menu
+│   ├── quick_download.bat             # One-click smart download
+│   └── install_ffmpeg.bat             # FFmpeg installer (Windows)
 ├── 📄 Documentation
 │   ├── README.md                      # Comprehensive documentation
 │   └── LICENSE                        # MIT License
