@@ -11,7 +11,8 @@ if "%url%"=="" (
 
 echo.
 echo 🎵 Downloading with smart features (best quality, duplicate detection)...
-.\.venv\Scripts\python.exe youtube_to_mp3_smart.py "%url%" -q 320 -w 3
+cd /d "%~dp0.."
+.\.venv\Scripts\python.exe src/youtube_to_mp3_smart.py "%url%" -q 320 -w 3
 echo.
 echo ✅ Download completed! Check your downloads folder.
 pause

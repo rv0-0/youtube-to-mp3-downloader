@@ -1,0 +1,23 @@
+{
+    "include": [
+        "src",
+        "tests"
+    ],
+    "extraPaths": [
+        "src"
+    ],
+    "pythonVersion": "3.10",
+    "pythonPlatform": "Windows",
+    "executionEnvironments": [
+        {
+            "root": ".",
+            "pythonVersion": "3.10",
+            "pythonPlatform": "Windows",
+            "extraPaths": [
+                "./src"
+            ]
+        }
+    ],
+    "reportMissingImports": "warning",
+    "reportMissingTypeStubs": false
+}

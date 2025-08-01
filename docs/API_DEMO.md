@@ -6,13 +6,13 @@ This project now includes a **FastAPI REST server** and **beautiful web interfac
 
 ### 1. Start the API Server
 ```cmd
-scripts\start_api_server.bat
+start_api_server.bat
 ```
 - Server runs on: http://localhost:8000
 - API Documentation: http://localhost:8000/docs
 
 ### 2. Use the Web Interface
-- Open `web\web_interface.html` in your browser
+- Open `web_interface.html` in your browser
 - Beautiful, responsive UI with real-time progress
 - Works on desktop, tablet, and mobile
 

@@ -19,9 +19,16 @@ from pydantic import BaseModel, HttpUrl, validator
 import uvicorn
 
 # Import our existing downloader modules
-from youtube_to_mp3_smart import SmartYouTubeDownloader
-from youtube_to_mp3_advanced import AdvancedYouTubeDownloader
-from youtube_to_mp3 import download_youtube_to_mp3, batch_download_from_file
+try:
+    # Try relative imports first (when run as module)
+    from .youtube_to_mp3_smart import SmartYouTubeDownloader
+    from .youtube_to_mp3_advanced import AdvancedYouTubeDownloader
+    from .youtube_to_mp3 import download_youtube_to_mp3, batch_download_from_file
+except ImportError:
+    # Fall back to direct imports (when run directly)
+    from youtube_to_mp3_smart import SmartYouTubeDownloader
+    from youtube_to_mp3_advanced import AdvancedYouTubeDownloader
+    from youtube_to_mp3 import download_youtube_to_mp3, batch_download_from_file
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -208,9 +215,9 @@ async def download_video(request: DownloadRequest, background_tasks: BackgroundT
             download_single_video,
             task_id,
             str(request.url),
-            request.quality,
-            request.output_dir,
-            request.mode
+            request.quality or 192,
+            request.output_dir or "downloads",
+            request.mode or "smart"
         )
         
         return DownloadResponse(
@@ -253,10 +260,10 @@ async def batch_download_videos(request: BatchDownloadRequest, background_tasks:
             download_batch_videos,
             task_id,
             urls,
-            request.quality,
-            request.output_dir,
-            request.mode,
-            request.max_workers
+            request.quality or 192,
+            request.output_dir or "downloads",
+            request.mode or "smart",
+            request.max_workers or 3
         )
         
         estimated_time = f"{len(urls) * 2}-{len(urls) * 4} minutes"
@@ -296,7 +303,8 @@ async def get_all_tasks():
 async def get_video_info(url: str):
     """Get information about a YouTube video without downloading"""
     try:
-        downloader = get_smart_downloader("temp", 192)
+        # Use basic downloader's get_video_info method
+        downloader = get_basic_downloader("temp", 192)
         info = await asyncio.get_event_loop().run_in_executor(
             None, downloader.get_video_info, url
         )
@@ -389,7 +397,7 @@ async def delete_file(filename: str, directory: str = "downloads"):
 async def upload_urls_file(file: UploadFile = File(...)):
     """Upload a text file containing YouTube URLs for batch download"""
     try:
-        if not file.filename.endswith(('.txt', '.csv')):
+        if not file.filename or not file.filename.endswith(('.txt', '.csv')):
             raise HTTPException(status_code=400, detail="Only .txt and .csv files are allowed")
         
         content = await file.read()
@@ -429,15 +437,28 @@ async def download_single_video(task_id: str, url: str, quality: int, output_dir
         # Download the video
         download_tasks[task_id]["progress"] = 50.0
         result = await asyncio.get_event_loop().run_in_executor(
-            None, downloader.download_video, url, quality
+            None, downloader.download_single_video, url, 0
         )
         
         if result:
-            download_tasks[task_id]["status"] = "completed"
-            download_tasks[task_id]["progress"] = 100.0
-            download_tasks[task_id]["downloaded_files"] = [result] if isinstance(result, str) else result
-            download_tasks[task_id]["completed_at"] = datetime.now()
-            logger.info(f"Download completed for task {task_id}: {url}")
+            # Handle tuple result from download_single_video (success, url, file_path)
+            if isinstance(result, tuple) and len(result) >= 3:
+                success, _, file_path = result
+                if success and file_path:
+                    download_tasks[task_id]["status"] = "completed"
+                    download_tasks[task_id]["progress"] = 100.0
+                    download_tasks[task_id]["downloaded_files"] = [str(file_path)]
+                    download_tasks[task_id]["completed_at"] = datetime.now()
+                    logger.info(f"Download completed for task {task_id}: {url}")
+                else:
+                    download_tasks[task_id]["status"] = "failed"
+                    download_tasks[task_id]["error_message"] = "Download failed"
+            else:
+                download_tasks[task_id]["status"] = "completed"
+                download_tasks[task_id]["progress"] = 100.0
+                download_tasks[task_id]["downloaded_files"] = [result] if isinstance(result, str) else result
+                download_tasks[task_id]["completed_at"] = datetime.now()
+                logger.info(f"Download completed for task {task_id}: {url}")
         else:
             download_tasks[task_id]["status"] = "failed"
             download_tasks[task_id]["error_message"] = "Download failed"
@@ -470,14 +491,17 @@ async def download_batch_videos(task_id: str, urls: List[str], quality: int, out
                 download_tasks[task_id]["progress"] = (i / total_urls) * 100
                 
                 result = await asyncio.get_event_loop().run_in_executor(
-                    None, downloader.download_video, url, quality
+                    None, downloader.download_single_video, url, 0
                 )
                 
                 if result:
-                    if isinstance(result, str):
+                    # Handle tuple result from download_single_video (success, url, file_path)
+                    if isinstance(result, tuple) and len(result) >= 3:
+                        success, _, file_path = result
+                        if success and file_path:
+                            downloaded_files.append(str(file_path))
+                    elif isinstance(result, str):
                         downloaded_files.append(result)
-                    else:
-                        downloaded_files.extend(result)
                 
                 download_tasks[task_id]["downloaded_files"] = downloaded_files
                 

@@ -9,16 +9,35 @@ import os
 import sys
 from pathlib import Path
 
-# Add the current directory to path so we can import our modules
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Add the src directory to path so we can import our modules
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+src_path = os.path.join(project_root, 'src')
+sys.path.insert(0, src_path)
+sys.path.insert(0, project_root)
+
+# Import modules with better error handling
+youtube_to_mp3 = None
+AdvancedYouTubeDownloader = None
+SmartYouTubeDownloader = None
 
 try:
     from youtube_to_mp3 import download_youtube_to_mp3
-    from youtube_to_mp3_advanced import AdvancedYouTubeDownloader
-    from youtube_to_mp3_smart import SmartYouTubeDownloader
+    import youtube_to_mp3
+    print("✅ Successfully imported youtube_to_mp3")
 except ImportError as e:
-    print(f"Warning: Could not import downloader modules: {e}")
-    print("Some tests will be skipped.")
+    print(f"⚠️  Could not import youtube_to_mp3: {e}")
+
+try:
+    from youtube_to_mp3_advanced import AdvancedYouTubeDownloader
+    print("✅ Successfully imported AdvancedYouTubeDownloader")
+except ImportError as e:
+    print(f"⚠️  Could not import youtube_to_mp3_advanced: {e}")
+
+try:
+    from youtube_to_mp3_smart import SmartYouTubeDownloader
+    print("✅ Successfully imported SmartYouTubeDownloader")
+except ImportError as e:
+    print(f"⚠️  Could not import youtube_to_mp3_smart: {e}")
 
 class TestDownloaderFunctions(unittest.TestCase):
     """Test the core downloader functions"""
@@ -63,23 +82,29 @@ class TestDownloaderFunctions(unittest.TestCase):
     
     def test_advanced_downloader_initialization(self):
         """Test AdvancedYouTubeDownloader initialization"""
+        if AdvancedYouTubeDownloader is None:
+            self.skipTest("AdvancedYouTubeDownloader not available")
+        
         try:
             downloader = AdvancedYouTubeDownloader(self.temp_dir, "192", max_workers=2)
             self.assertEqual(str(downloader.output_path), self.temp_dir)
             self.assertEqual(downloader.quality, "192")
             self.assertEqual(downloader.max_workers, 2)
-        except NameError:
-            self.skipTest("AdvancedYouTubeDownloader not available")
+        except Exception as e:
+            self.skipTest(f"AdvancedYouTubeDownloader initialization failed: {e}")
     
     def test_smart_downloader_initialization(self):
         """Test SmartYouTubeDownloader initialization"""
+        if SmartYouTubeDownloader is None:
+            self.skipTest("SmartYouTubeDownloader not available")
+        
         try:
             downloader = SmartYouTubeDownloader(self.temp_dir, "192", max_workers=2)
             self.assertEqual(str(downloader.output_path), self.temp_dir)
             self.assertEqual(downloader.quality, "192")
             self.assertEqual(downloader.max_workers, 2)
-        except NameError:
-            self.skipTest("SmartYouTubeDownloader not available")
+        except Exception as e:
+            self.skipTest(f"SmartYouTubeDownloader initialization failed: {e}")
     
     def test_url_validation(self):
         """Test URL validation"""

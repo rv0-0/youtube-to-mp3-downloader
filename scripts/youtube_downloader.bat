@@ -10,6 +10,9 @@ echo.
 
 set "python_exe=.\.venv\Scripts\python.exe"
 
+REM Change to parent directory (project root)
+cd /d "%~dp0.."
+
 REM Check if Python virtual environment exists
 if not exist "%python_exe%" (
     echo ❌ Error: Python virtual environment not found.
@@ -66,7 +69,7 @@ set /p quality="Enter quality (64/128/192/256/320) [192]: "
 if "%quality%"=="" set "quality=192"
 echo.
 echo Downloading with basic mode...
-& "%python_exe%" youtube_to_mp3.py "%url%" -q "%quality%"
+& "%python_exe%" src/youtube_to_mp3.py "%url%" -q "%quality%"
 goto :end
 
 :advanced_download
@@ -79,7 +82,7 @@ if "%quality%"=="" set "quality=192"
 if "%workers%"=="" set "workers=3"
 echo.
 echo Downloading with advanced features (parallel, thumbnails, metadata)...
-& "%python_exe%" youtube_to_mp3_advanced.py "%url%" -q "%quality%" -w "%workers%"
+& "%python_exe%" src/youtube_to_mp3_advanced.py "%url%" -q "%quality%" -w "%workers%"
 goto :end
 
 :smart_download
@@ -92,7 +95,7 @@ if "%quality%"=="" set "quality=192"
 if "%workers%"=="" set "workers=3"
 echo.
 echo Downloading with smart features (duplicate detection, auto-retry, organization)...
-& "%python_exe%" youtube_to_mp3_smart.py "%url%" -q "%quality%" -w "%workers%"
+& "%python_exe%" src/youtube_to_mp3_smart.py "%url%" -q "%quality%" -w "%workers%"
 goto :end
 
 :batch_download

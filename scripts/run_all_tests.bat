@@ -8,6 +8,9 @@ echo.
 
 set "python_exe=.\.venv\Scripts\python.exe"
 
+REM Change to parent directory (project root)
+cd /d "%~dp0.."
+
 REM Check if Python virtual environment exists
 if not exist "%python_exe%" (
     echo ❌ Error: Python virtual environment not found.
@@ -31,7 +34,7 @@ if "%choice%"=="1" (
     echo 🔬 Running Unit Tests...
     echo Testing core functions and validation logic.
     echo.
-    "%python_exe%" test_units.py
+    "%python_exe%" tests/test_units.py
     echo.
     echo ✅ Unit tests completed!
     
